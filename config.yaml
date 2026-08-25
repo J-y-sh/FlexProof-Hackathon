@@ -1,0 +1,100 @@
+simulation:
+  duration_days: 30
+  resolution_minutes: 15
+  intervals: 2880
+  random_seed: 42
+
+feeder:
+  firm_limit_kw: 2300.0
+  warning_threshold: 0.85
+  watch_threshold: 0.75
+
+demand:
+  residential_peak_kw: 1635.0
+  commercial_peak_kw: 650.0
+  industrial_peak_kw: 450.0
+  noise_std: 0.02
+
+renewable:
+  solar_capacity_kw: 800.0
+  cloud_probability: 0.15
+  noise_std: 0.03
+
+battery:
+  capacity_kwh: 500.0
+  max_charge_power_kw: 150.0
+  max_discharge_power_kw: 150.0
+  min_soc: 0.50
+  max_soc: 0.90
+  initial_soc: 0.70
+  charge_efficiency: 0.95
+  discharge_efficiency: 0.95
+
+flexible_loads:
+  ev_charging:
+    count: 25
+    power_per_unit_kw: 7.0
+    flexibility_fraction: 0.8
+    min_shift_intervals: 2
+    max_shift_intervals: 8
+    response_time_intervals: 1
+    priority: 2
+  water_pumping:
+    count: 10
+    power_per_unit_kw: 15.0
+    flexibility_fraction: 0.7
+    min_shift_intervals: 4
+    max_shift_intervals: 16
+    response_time_intervals: 2
+    priority: 3
+  hvac:
+    count: 30
+    power_per_unit_kw: 3.0
+    flexibility_fraction: 0.5
+    min_shift_intervals: 1
+    max_shift_intervals: 4
+    response_time_intervals: 1
+    priority: 1
+  commercial_refrigeration:
+    count: 8
+    power_per_unit_kw: 5.0
+    flexibility_fraction: 0.3
+    min_shift_intervals: 1
+    max_shift_intervals: 2
+    response_time_intervals: 1
+    priority: 4
+  agricultural_pumping:
+    count: 5
+    power_per_unit_kw: 20.0
+    flexibility_fraction: 0.6
+    min_shift_intervals: 4
+    max_shift_intervals: 12
+    response_time_intervals: 2
+    priority: 3
+
+forecasting:
+  horizon_intervals: 4
+  model_type: lightweight
+  lookback_intervals: 96
+  update_frequency: 1
+
+stress:
+  risk_thresholds:
+    watch: 0.75
+    warning: 0.85
+    critical: 0.95
+
+controller:
+  predictive:
+    reserve_margin: 0.1
+    min_reserve_soc: 0.55
+    dispatch_threshold: 0.90
+    preparation_intervals: 4
+  reactive:
+    activation_threshold: 1.0
+    max_battery_discharge_fraction: 0.55
+
+paths:
+  raw_data: data/raw
+  processed_data: data/processed
+  sample_data: data/sample

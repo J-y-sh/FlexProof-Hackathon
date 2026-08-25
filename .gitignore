@@ -1,0 +1,13 @@
+# Standard Python .gitignore
+.venv/
+.env
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+
+# FlexProof specific
+data/processed/*.csv
+.streamlit/secrets.toml
