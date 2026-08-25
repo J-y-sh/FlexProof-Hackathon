@@ -1,13 +1,33 @@
-# Standard Python .gitignore
-.venv/
-.env
+# Byte-compiled / optimized / DLL files
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+.env
+
+# Testing & Linting caches
 .pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.log
+
+# Distribution / packaging
 *.egg-info/
 dist/
 build/
 
-# FlexProof specific
-data/processed/*.csv
+# IDE & Editor artifacts
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Agent & local secrets
+.agents/
+.claude/
 .streamlit/secrets.toml
