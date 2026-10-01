@@ -21,13 +21,13 @@ def load_configuration(config_path: str = "config.yaml") -> FlexProofConfig:
 @st.cache_data(show_spinner=False)
 def load_scenario_data(data_dir: str = "data/processed") -> Dict[str, pd.DataFrame]:
     """Load scenario dataframes from processed CSV files.
-    
+
     Returns:
         Dict with keys 'baseline', 'reactive', 'predictive'
     """
     path = Path(data_dir)
     scenarios = {}
-    
+
     for name in ['baseline', 'reactive', 'predictive']:
         csv_file = path / f"{name}.csv"
         if not csv_file.exists():
@@ -38,20 +38,20 @@ def load_scenario_data(data_dir: str = "data/processed") -> Dict[str, pd.DataFra
         df = pd.read_csv(csv_file, parse_dates=['timestamp'])
         df.set_index('timestamp', inplace=True)
         scenarios[name] = df
-        
+
     return scenarios
 
 
 @st.cache_data(show_spinner=False)
 def load_event_data(data_dir: str = "data/processed") -> Dict[str, pd.DataFrame]:
     """Load controller event logs from processed CSV files.
-    
+
     Returns:
         Dict with keys 'reactive', 'predictive'
     """
     path = Path(data_dir)
     events = {}
-    
+
     for name in ['reactive', 'predictive']:
         csv_file = path / f"{name}_events.csv"
         if csv_file.exists():
@@ -59,7 +59,7 @@ def load_event_data(data_dir: str = "data/processed") -> Dict[str, pd.DataFrame]
             events[name] = df
         else:
             events[name] = pd.DataFrame()
-            
+
     return events
 
 
@@ -71,22 +71,22 @@ def load_all_data(data_dir: str = "data/processed") -> Tuple[Dict[str, pd.DataFr
     return scenarios, events
 
 
-def compute_scenario_metrics(df: pd.DataFrame, 
-                             firm_limit_kw: float = 2300.0, 
+def compute_scenario_metrics(df: pd.DataFrame,
+                             firm_limit_kw: float = 2300.0,
                              dt_hours: float = 0.25) -> Dict[str, float]:
     """Dynamically compute key performance indicators from a scenario dataframe."""
     controlled_nd = df['controlled_net_demand_kw'].values if 'controlled_net_demand_kw' in df.columns else df['net_demand_kw'].values
     raw_nd = df['net_demand_kw'].values
-    
+
     deficit = np.maximum(0.0, controlled_nd - firm_limit_kw)
     stress_mask = controlled_nd > firm_limit_kw
     stress_count = int(np.sum(stress_mask))
-    
+
     # Battery metrics
     soc_values = df['battery_soc'].values if 'battery_soc' in df.columns else np.array([0.7])
     min_soc = float(np.min(soc_values))
     max_soc = float(np.max(soc_values))
-    
+
     # Battery throughput: sum of absolute SOC changes converted to kWh
     if 'battery_soc' in df.columns and len(df) > 1:
         soc_diffs = np.abs(np.diff(soc_values))
@@ -94,11 +94,11 @@ def compute_scenario_metrics(df: pd.DataFrame,
         throughput_kwh = float(np.sum(soc_diffs) * 500.0)
     else:
         throughput_kwh = 0.0
-        
+
     # Flexibility metrics
     flex_disp = df['flexibility_dispatched_kw'].values if 'flexibility_dispatched_kw' in df.columns else np.zeros(len(df))
     shifted_energy_kwh = float(np.sum(flex_disp) * dt_hours)
-    
+
     # Forecast errors if available
     if 'forecast_net_demand_kw' in df.columns and np.any(df['forecast_net_demand_kw'] > 0):
         valid_fc = df['forecast_net_demand_kw'] > 0
@@ -108,7 +108,7 @@ def compute_scenario_metrics(df: pd.DataFrame,
     else:
         mae = 0.0
         rmse = 0.0
-        
+
     return {
         'stress_intervals': stress_count,
         'stress_duration_hours': stress_count * dt_hours,
@@ -126,7 +126,7 @@ def compute_scenario_metrics(df: pd.DataFrame,
     }
 
 
-def compute_comparative_summary(scenarios: Dict[str, pd.DataFrame], 
+def compute_comparative_summary(scenarios: Dict[str, pd.DataFrame],
                                 firm_limit_kw: float = 2300.0,
                                 dt_hours: float = 0.25) -> Dict[str, Dict]:
     """Compute metrics for all scenarios and derive relative percentage improvements."""
@@ -134,16 +134,16 @@ def compute_comparative_summary(scenarios: Dict[str, pd.DataFrame],
     for name in ['baseline', 'reactive', 'predictive']:
         if name in scenarios:
             summary[name] = compute_scenario_metrics(scenarios[name], firm_limit_kw, dt_hours)
-            
+
     # Compute relative improvements
     if 'baseline' in summary and 'reactive' in summary and 'predictive' in summary:
         b = summary['baseline']
         r = summary['reactive']
         p = summary['predictive']
-        
+
         def pct_red(base_val, new_val):
             return ((base_val - new_val) / base_val * 100) if base_val > 0 else 0.0
-            
+
         summary['improvements'] = {
             'reactive_deficit_reduction_pct': pct_red(b['deficit_energy_kwh'], r['deficit_energy_kwh']),
             'reactive_stress_reduction_pct': pct_red(b['stress_intervals'], r['stress_intervals']),
@@ -154,5 +154,5 @@ def compute_comparative_summary(scenarios: Dict[str, pd.DataFrame],
             'peak_shaving_reactive_kw': b['peak_net_demand_kw'] - r['peak_net_demand_kw'],
             'peak_shaving_predictive_kw': b['peak_net_demand_kw'] - p['peak_net_demand_kw'],
         }
-        
+
     return summary
