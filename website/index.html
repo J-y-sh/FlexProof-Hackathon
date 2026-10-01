@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlexProof — Predictive Neighbourhood Grid Flexibility Platform</title>
+  <meta name="description" content="Predict feeder stress before it becomes a reliability event. Predictive neighbourhood grid flexibility platform developed for Schneider Electric Yuva Yodha Energy Tech Hackathon 2026.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2306b6d4'><path d='M13 2L3 14h9l-1 8 10-12h-9z'/></svg>">
+  <style>
+    :root {
+      --bg-primary: #070b14;
+      --bg-secondary: #0b1120;
+      --bg-card: #0f172a;
+      --bg-card-hover: #131d35;
+      --border-subtle: #1e293b;
+      --border-accent: #334155;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --accent-cyan: #06b6d4;
+      --accent-sky: #38bdf8;
+      --accent-teal: #14b8a6;
+      --accent-green: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-red: #ef4444;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      line-height: 1.6;
+    }
+
+    body {
+      min-height: 100vh;
+      overflow-x: hidden;
+      background: radial-gradient(circle at 50% 0%, #0d1b33 0%, var(--bg-primary) 70%);
+    }
+
+    /* Container & Layout */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .section {
+      padding: 80px 0;
+      border-bottom: 1px solid var(--border-subtle);
+      position: relative;
+    }
+
+    /* Navbar */
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(7, 11, 20, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 16px 0;
+    }
+
+    .nav-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-main);
+      font-weight: 800;
+      font-size: 1.25rem;
+      letter-spacing: -0.02em;
+    }
+
+    .nav-logo svg {
+      width: 28px;
+      height: 28px;
+    }
+
+    .nav-tag {
+      font-size: 0.7rem;
+      color: var(--accent-sky);
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: rgba(6, 182, 212, 0.1);
+      padding: 2px 8px;
+      border-radius: 4px;
+      border: 1px solid rgba(6, 182, 212, 0.3);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 0.15s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--accent-sky);
+    }
+
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(6, 182, 212, 0.15);
+      color: var(--accent-sky);
+      border: 1px solid rgba(6, 182, 212, 0.4);
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .nav-cta:hover {
+      background: var(--accent-cyan);
+      color: #031422;
+      border-color: var(--accent-cyan);
+    }
+
+    /* Hero Section */
+    .hero {
+      padding: 90px 0 70px;
+      text-align: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(6, 182, 212, 0.1);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      color: var(--accent-sky);
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 6px 14px;
+      border-radius: 20px;
+      margin-bottom: 20px;
+    }
+
+    .eyebrow-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent-cyan);
+      box-shadow: 0 0 8px var(--accent-cyan);
+    }
+
+    .hero-title {
+      font-size: clamp(2.5rem, 6vw, 4.2rem);
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 12px;
+      background: linear-gradient(180deg, #ffffff 30%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(1.1rem, 2.5vw, 1.45rem);
+      color: var(--accent-sky);
+      font-weight: 600;
+      margin-bottom: 16px;
+      letter-spacing: -0.01em;
+    }
+
+    .hero-thesis {
+      font-size: clamp(1.2rem, 3vw, 1.85rem);
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 16px;
+      letter-spacing: -0.02em;
+    }
+
+    .hero-thesis em {
+      font-style: normal;
+      color: var(--accent-green);
+      text-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+    }
+
+    .hero-desc {
+      max-width: 780px;
+      margin: 0 auto 32px;
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      line-height: 1.6;
+    }
+
+    .hero-actions {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 40px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #0284c7 0%, #06b6d4 100%);
+      color: #ffffff;
+      border: 1px solid #38bdf8;
+      box-shadow: 0 4px 16px rgba(2, 132, 199, 0.4);
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 6px 24px rgba(6, 182, 212, 0.6);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: rgba(15, 23, 42, 0.8);
+      color: var(--text-main);
+      border: 1px solid var(--border-accent);
+    }
+
+    .btn-secondary:hover {
+      background: #1e293b;
+      border-color: var(--accent-sky);
+    }
+
+    .loop-strip {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 20px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--border-subtle);
+      border-radius: 30px;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .loop-step {
+      font-weight: 700;
+      color: var(--accent-sky);
+    }
+
+    .loop-arrow {
+      color: var(--text-dim);
+    }
+
+    /* Hero Visual Card */
+    .hero-visual {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 24px;
+      margin-top: 36px;
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
+      text-align: left;
+    }
+
+    .visual-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .visual-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .visual-legend {
+      display: flex;
+      gap: 16px;
+      font-size: 0.78rem;
+      font-family: var(--font-mono);
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend-line {
+      width: 16px;
+      height: 3px;
+      border-radius: 2px;
+    }
+
+    .svg-canvas {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .visual-caption {
+      margin-top: 12px;
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+      text-align: right;
+    }
+
+    /* Proof Strip */
+    .proof-strip {
+      background: var(--bg-secondary);
+      padding: 50px 0;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .proof-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+    }
+
+    .proof-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-top: 3px solid var(--accent-cyan);
+      border-radius: 10px;
+      padding: 20px 22px;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .proof-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent-sky);
+    }
+
+    .proof-stat {
+      font-size: 2.5rem;
+      font-weight: 900;
+      line-height: 1.1;
+      margin-bottom: 6px;
+      font-family: var(--font-mono);
+    }
+
+    .stat-green {
+      color: var(--accent-green);
+    }
+
+    .stat-cyan {
+      color: var(--accent-sky);
+    }
+
+    .stat-amber {
+      color: var(--accent-amber);
+    }
+
+    .stat-teal {
+      color: var(--accent-teal);
+    }
+
+    .proof-label {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 4px;
+    }
+
+    .proof-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* Section Titles */
+    .section-tag {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--accent-sky);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+    }
+
+    .section-title {
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      margin-bottom: 12px;
+      color: var(--text-main);
+    }
+
+    .section-desc {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      max-width: 720px;
+      line-height: 1.6;
+      margin-bottom: 40px;
+    }
+
+    /* Problem Section */
+    .problem-chain {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 16px;
+      position: relative;
+    }
+
+    .problem-step {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 20px;
+      position: relative;
+    }
+
+    .problem-step-num {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--accent-amber);
+      margin-bottom: 6px;
+    }
+
+    .problem-step-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+
+    .problem-step-text {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* 5-Stage Operating Loop Section */
+    .stages-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .stage-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-top: 3px solid var(--accent-cyan);
+      border-radius: 8px;
+      padding: 22px 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .stage-card:nth-child(2) { border-top-color: #38bdf8; }
+    .stage-card:nth-child(3) { border-top-color: #a855f7; }
+    .stage-card:nth-child(4) { border-top-color: #10b981; }
+    .stage-card:nth-child(5) { border-top-color: #f59e0b; }
+
+    .stage-num {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--accent-sky);
+      margin-bottom: 4px;
+    }
+
+    .stage-name {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 8px;
+    }
+
+    .stage-desc {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* Flexibility Resources */
+    .resources-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    .resource-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 28px;
+    }
+
+    .resource-badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 4px;
+      background: rgba(6, 182, 212, 0.12);
+      color: var(--accent-sky);
+      margin-bottom: 12px;
+    }
+
+    .resource-title {
+      font-size: 1.3rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+      color: var(--text-main);
+    }
+
+    .resource-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+
+    .resource-specs {
+      list-style: none;
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 12px;
+      font-size: 0.82rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+    }
+
+    .resource-specs li {
+      padding: 4px 0;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .resource-specs span {
+      color: var(--text-main);
+      font-weight: 600;
+    }
+
+    /* Benchmark Table */
+    .table-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      overflow-x: auto;
+      margin-bottom: 24px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    th {
+      background: #111a2e;
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 16px 20px;
+      border-bottom: 2px solid var(--border-accent);
+    }
+
+    td {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-main);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .col-baseline { color: #fca5a5; font-family: var(--font-mono); }
+    .col-reactive { color: #fde68a; font-family: var(--font-mono); }
+    .col-flexproof {
+      color: #6ee7b7;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      background: rgba(16, 185, 129, 0.06);
+      border-left: 2px solid var(--accent-green);
+      border-right: 2px solid var(--accent-green);
+    }
+    .col-impact { color: var(--accent-sky); font-weight: 700; font-family: var(--font-mono); }
+
+    /* Operator Evidence Grid */
+    .evidence-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .evidence-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 22px;
+    }
+
+    .evidence-stat {
+      font-size: 2.1rem;
+      font-weight: 900;
+      font-family: var(--font-mono);
+      color: var(--accent-sky);
+      margin-bottom: 4px;
+    }
+
+    .evidence-label {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+
+    .evidence-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* Scope Banner */
+    .scope-banner {
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid var(--border-accent);
+      border-left: 4px solid var(--accent-sky);
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin: 30px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .scope-text {
+      font-size: 0.95rem;
+      color: var(--text-main);
+      font-weight: 600;
+    }
+
+    .scope-tag {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--accent-amber);
+      background: rgba(245, 158, 11, 0.1);
+      padding: 4px 10px;
+      border-radius: 4px;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      font-weight: 700;
+    }
+
+    /* Architecture Flow */
+    .arch-flow {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-width: 820px;
+      margin: 0 auto;
+    }
+
+    .arch-step {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .arch-num {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(6, 182, 212, 0.15);
+      color: var(--accent-sky);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+
+    .arch-info h4 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 2px;
+    }
+
+    .arch-info p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .arch-connector {
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 1.1rem;
+      line-height: 1;
+    }
+
+    /* Links & CTA Section */
+    .cta-section {
+      text-align: center;
+      padding: 80px 0;
+      background: radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.08) 0%, transparent 70%);
+    }
+
+    .cta-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      max-width: 720px;
+      margin: 32px auto 0;
+    }
+
+    .cta-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 28px;
+      text-decoration: none;
+      color: var(--text-main);
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .cta-box:hover {
+      border-color: var(--accent-cyan);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px -10px rgba(6, 182, 212, 0.3);
+    }
+
+    .cta-box-icon {
+      margin-bottom: 12px;
+    }
+
+    .cta-box-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .cta-box-sub {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .cta-box-btn {
+      font-size: 0.82rem;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: var(--accent-sky);
+    }
+
+    /* Team Section */
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .team-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .team-name {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 4px;
+    }
+
+    .team-role {
+      font-size: 0.85rem;
+      color: var(--accent-sky);
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .team-org {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    /* Footer */
+    .footer {
+      padding: 40px 0;
+      text-align: center;
+      border-top: 1px solid var(--border-subtle);
+      background: var(--bg-primary);
+      font-size: 0.85rem;
+      color: var(--text-dim);
+    }
+
+    .footer-thesis {
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-family: var(--font-mono);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .section { padding: 50px 0; }
+      .hero { padding: 60px 0 40px; }
+      .proof-stat { font-size: 2.1rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a href="#" class="nav-logo">
+        <svg viewBox="0 0 24 24" fill="none">
+          <rect width="24" height="24" rx="6" fill="#0369a1"/>
+          <path d="M13 3L4 14H12L11 21L20 10H12L13 3Z" fill="#38bdf8" stroke="#ffffff" stroke-width="0.8" stroke-linejoin="round"/>
+        </svg>
+        <span>FlexProof</span>
+        <span class="nav-tag">Prototype</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#problem">Problem</a></li>
+        <li><a href="#operating-loop">5-Stage Loop</a></li>
+        <li><a href="#flexibility">Flexibility</a></li>
+        <li><a href="#results">Results</a></li>
+        <li><a href="#architecture">Architecture</a></li>
+        <li><a href="#team">Team</a></li>
+      </ul>
+      <a href="YOUR_STREAMLIT_DASHBOARD_URL" target="_blank" rel="noopener noreferrer" class="nav-cta">
+        <span>Control Room</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      </a>
+    </div>
+  </nav>
+
+  <!-- 1. HERO -->
+  <header class="hero">
+    <div class="container">
+      <div class="eyebrow">
+        <span class="eyebrow-dot"></span>
+        <span>Yuva Yodha Energy Tech Hackathon 2026</span>
+      </div>
+      <h1 class="hero-title">FlexProof</h1>
+      <p class="hero-subtitle">Predictive Neighbourhood Grid Flexibility Platform</p>
+      <h2 class="hero-thesis">"Predict feeder stress <em>before</em> it becomes a reliability event."</h2>
+      <p class="hero-desc">
+        FlexProof anticipates feeder stress and coordinates flexible loads, battery storage, and reserve capacity before reliability limits are breached.
+      </p>
+
+      <div class="hero-actions">
+        <a href="YOUR_STREAMLIT_DASHBOARD_URL" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          <span>Explore Control Room</span>
+        </a>
+        <a href="YOUR_GITHUB_REPOSITORY_URL" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          <span>View GitHub</span>
+        </a>
+      </div>
+
+      <div class="loop-strip">
+        <span class="loop-step">Predict</span>
+        <span class="loop-arrow">→</span>
+        <span class="loop-step">Prepare</span>
+        <span class="loop-arrow">→</span>
+        <span class="loop-step">Coordinate</span>
+        <span class="loop-arrow">→</span>
+        <span class="loop-step">Dispatch</span>
+        <span class="loop-arrow">→</span>
+        <span class="loop-step">Learn</span>
+      </div>
+
+      <!-- 2. HERO VISUAL -->
+      <div class="hero-visual">
+        <div class="visual-header">
+          <div class="visual-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span>Feeder Control-Loop Coordination Telemetry (Illustrative Peak Window)</span>
+          </div>
+          <div class="visual-legend">
+            <div class="legend-item"><div class="legend-line" style="background: #ef4444; border-top: 1px dashed #ef4444;"></div><span>Unmanaged Net Demand</span></div>
+            <div class="legend-item"><div class="legend-line" style="background: #38bdf8; border-top: 1px dashed #38bdf8;"></div><span>2,300 kW Firm Limit</span></div>
+            <div class="legend-item"><div class="legend-line" style="background: #10b981;"></div><span>FlexProof Controlled Demand</span></div>
+            <div class="legend-item"><div class="legend-line" style="background: #a855f7;"></div><span>Pre-Shifted Flexibility</span></div>
+          </div>
+        </div>
+
+        <svg class="svg-canvas" viewBox="0 0 960 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Background Grid Lines -->
+          <line x1="60" y1="40" x2="920" y2="40" stroke="#1e293b" stroke-width="1"/>
+          <line x1="60" y1="90" x2="920" y2="90" stroke="#1e293b" stroke-width="1"/>
+          <line x1="60" y1="140" x2="920" y2="140" stroke="#1e293b" stroke-width="1"/>
+          <line x1="60" y1="190" x2="920" y2="190" stroke="#1e293b" stroke-width="1"/>
+          <line x1="60" y1="230" x2="920" y2="230" stroke="#334155" stroke-width="1.5"/>
+
+          <!-- Time Vertical Markers -->
+          <line x1="160" y1="40" x2="160" y2="230" stroke="#1e293b" stroke-dasharray="3 3"/>
+          <line x1="360" y1="40" x2="360" y2="230" stroke="#1e293b" stroke-dasharray="3 3"/>
+          <line x1="560" y1="40" x2="560" y2="230" stroke="#1e293b" stroke-dasharray="3 3"/>
+          <line x1="760" y1="40" x2="760" y2="230" stroke="#1e293b" stroke-dasharray="3 3"/>
+
+          <!-- Axis Labels -->
+          <text x="50" y="44" fill="#64748b" font-size="11" font-family="monospace" text-anchor="end">2,600 kW</text>
+          <text x="50" y="94" fill="#38bdf8" font-size="11" font-family="monospace" text-anchor="end" font-weight="bold">2,300 kW</text>
+          <text x="50" y="144" fill="#64748b" font-size="11" font-family="monospace" text-anchor="end">2,000 kW</text>
+          <text x="50" y="194" fill="#64748b" font-size="11" font-family="monospace" text-anchor="end">1,700 kW</text>
+
+          <text x="160" y="246" fill="#64748b" font-size="11" font-family="monospace" text-anchor="middle">16:00</text>
+          <text x="360" y="246" fill="#64748b" font-size="11" font-family="monospace" text-anchor="middle">17:00</text>
+          <text x="460" y="246" fill="#06b6d4" font-size="11" font-family="monospace" text-anchor="middle" font-weight="bold">17:45 [1-Hr Lookahead]</text>
+          <text x="660" y="246" fill="#ef4444" font-size="11" font-family="monospace" text-anchor="middle" font-weight="bold">18:45 [Peak Stress]</text>
+          <text x="860" y="246" fill="#64748b" font-size="11" font-family="monospace" text-anchor="middle">20:00</text>
+
+          <!-- 2,300 kW Feeder Firm Limit Line -->
+          <line x1="60" y1="90" x2="920" y2="90" stroke="#38bdf8" stroke-width="2" stroke-dasharray="6 4"/>
+
+          <!-- Pre-Dispatch Lookahead Annotation Zone -->
+          <rect x="460" y="40" width="200" height="190" fill="rgba(6, 182, 212, 0.05)"/>
+          <line x1="460" y1="40" x2="460" y2="230" stroke="#06b6d4" stroke-width="1.5" stroke-dasharray="4 3"/>
+
+          <!-- Flexibility Dispatched Shaded Area (Loads Shifted) -->
+          <path d="M 460 170 Q 560 120 660 38 Q 760 100 860 180 L 860 180 Q 760 100 660 90 Q 560 120 460 170 Z" fill="rgba(168, 85, 247, 0.25)"/>
+
+          <!-- Baseline Curve (Breaching limit up to 2,621 kW) -->
+          <path d="M 80 210 Q 220 200 360 185 Q 460 170 560 110 Q 660 38 760 105 Q 860 180 920 205" stroke="#ef4444" stroke-width="2.5" stroke-dasharray="5 3" fill="none"/>
+
+          <!-- FlexProof Controlled Net Demand Curve (Clamped smoothly under 2,300 kW) -->
+          <path d="M 80 210 Q 220 200 360 185 Q 460 170 560 125 Q 660 90 760 108 Q 860 180 920 205" stroke="#10b981" stroke-width="3" fill="none"/>
+
+          <!-- Avoided Overload Callout Box -->
+          <g transform="translate(620, 20)">
+            <rect width="180" height="34" rx="4" fill="#0f172a" stroke="#10b981" stroke-width="1.5"/>
+            <circle cx="14" cy="17" r="4" fill="#10b981"/>
+            <text x="26" y="21" fill="#6ee7b7" font-size="11" font-family="monospace" font-weight="bold">314.41 kW PEAK SHAVED</text>
+          </g>
+
+          <!-- Pre-Dispatch Trigger Annotation -->
+          <g transform="translate(370, 70)">
+            <rect width="170" height="28" rx="4" fill="#0f172a" stroke="#06b6d4" stroke-width="1.2"/>
+            <text x="10" y="18" fill="#67e8f9" font-size="10" font-family="monospace" font-weight="bold">17:45 • LOAD PRE-SHIFT</text>
+          </g>
+        </svg>
+
+        <div class="visual-caption">
+          Illustrative control-loop telemetry model — simulation control-room prototype.
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 3. PROOF STRIP -->
+  <section class="proof-strip">
+    <div class="container">
+      <div class="proof-grid">
+        <div class="proof-card">
+          <div class="proof-stat stat-green">99.94%</div>
+          <div class="proof-label">Deficit Energy Reduction</div>
+          <div class="proof-sub">Residual unserved deficit reduced from 2,707.64 kWh to 1.67 kWh across 30 days.</div>
+        </div>
+        <div class="proof-card">
+          <div class="proof-stat stat-cyan">99.2%</div>
+          <div class="proof-label">Feeder Stress Reduction</div>
+          <div class="proof-sub">Feeder overload dropped from 125 intervals (31.25 h) to a single 15-min interval (0.25 h).</div>
+        </div>
+        <div class="proof-card">
+          <div class="proof-stat stat-amber">314.41 kW</div>
+          <div class="proof-label">Peak Demand Shaving</div>
+          <div class="proof-sub">Maximum feeder peak net loading suppressed from 2,621.11 kW down to 2,306.69 kW.</div>
+        </div>
+        <div class="proof-card">
+          <div class="proof-stat stat-teal">53.50%</div>
+          <div class="proof-label">Battery Throughput Reduction</div>
+          <div class="proof-sub">Storage cycling reduced from 1,552.60 kWh to 721.95 kWh vs. reactive control, preserving cell life.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. THE PROBLEM -->
+  <section id="problem" class="section">
+    <div class="container">
+      <div class="section-tag">01 • Problem Analysis</div>
+      <h2 class="section-title">Why Reactive Grid Control Fails at the Edge</h2>
+      <p class="section-desc">
+        As rooftop solar PV, electric vehicles, and heavy cooling loads expand on residential feeders, traditional threshold control triggers severe unintended battery degradation and residual deficits.
+      </p>
+
+      <div class="problem-chain">
+        <div class="problem-step">
+          <div class="problem-step-num">STEP 01</div>
+          <div class="problem-step-title">Renewable Intermittency</div>
+          <div class="problem-step-text">Rooftop solar output ramps down rapidly in the late afternoon just as domestic cooking, cooling, and commuter EV charging ramp up.</div>
+        </div>
+        <div class="problem-step">
+          <div class="problem-step-num">STEP 02</div>
+          <div class="problem-step-title">Forecast Uncertainty</div>
+          <div class="problem-step-text">Without lookahead forecasting, the distribution substation has zero visibility into steep coincidental evening net demand ramps.</div>
+        </div>
+        <div class="problem-step">
+          <div class="problem-step-num">STEP 03</div>
+          <div class="problem-step-title">Feeder Capacity Stress</div>
+          <div class="problem-step-text">Net load exceeds the 2,300 kW firm feeder rating, creating severe thermal stress and risking transformer asset degradation.</div>
+        </div>
+        <div class="problem-step">
+          <div class="problem-step-num">STEP 04</div>
+          <div class="problem-step-title">Reactive Actuator Delay</div>
+          <div class="problem-step-text">Threshold control acts only after limits are breached. Municipal water pumps and agricultural wells require 15–30 min to spool down and deliver zero immediate relief.</div>
+        </div>
+        <div class="problem-step">
+          <div class="problem-step-num">STEP 05</div>
+          <div class="problem-step-title">Battery Wear & Deficit</div>
+          <div class="problem-step-text">Batteries are forced into emergency high-rate discharge, accumulating 1,552.60 kWh of cycling throughput while still leaving unserved energy deficits.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. THE FLEXPROOF APPROACH -->
+  <section id="operating-loop" class="section">
+    <div class="container">
+      <div class="section-tag">02 • Control Architecture</div>
+      <h2 class="section-title">The Five-Stage Predictive Operating Loop</h2>
+      <p class="section-desc">
+        FlexProof executes a continuous closed-loop sequence across every 15-minute dispatch interval to prepare flexible assets before physical limits are breached.
+      </p>
+
+      <div class="stages-grid">
+        <div class="stage-card">
+          <div class="stage-num">STAGE 01</div>
+          <div class="stage-name">Predict</div>
+          <div class="stage-desc">Forecast renewable intermittency and net demand 1 hour ahead (4 intervals) from rolling telemetry without future data leakage.</div>
+        </div>
+        <div class="stage-card">
+          <div class="stage-num">STAGE 02</div>
+          <div class="stage-name">Prepare</div>
+          <div class="stage-desc">Pre-shift flexible demand resources (water pumping, agricultural wells, EV charging) with 15–30 min lead time before the stress window.</div>
+        </div>
+        <div class="stage-card">
+          <div class="stage-num">STAGE 03</div>
+          <div class="stage-name">Coordinate</div>
+          <div class="stage-desc">Coordinate flexible loads, battery storage envelope (50%–90% SOC), and dynamic reserve margins based on forecast gap severity.</div>
+        </div>
+        <div class="stage-card">
+          <div class="stage-num">STAGE 04</div>
+          <div class="stage-name">Dispatch</div>
+          <div class="stage-desc">Deploy available load flexibility during the critical interval, using the community battery as a fine-tuning precision buffer.</div>
+        </div>
+        <div class="stage-card">
+          <div class="stage-num">STAGE 05</div>
+          <div class="stage-name">Learn</div>
+          <div class="stage-desc">Verify response using measurable feeder outcomes; track error residuals to refine lookahead confidence bounds continuously.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. HOW THE FLEXIBILITY WORKS -->
+  <section id="flexibility" class="section">
+    <div class="container">
+      <div class="section-tag">03 • Flexibility Resources</div>
+      <h2 class="section-title">Three Coordinated Resources</h2>
+      <p class="section-desc">
+        Rather than dumping battery energy reactively, FlexProof coordinates a multi-tier flexibility portfolio across the neighbourhood.
+      </p>
+
+      <div class="resources-grid">
+        <div class="resource-card">
+          <span class="resource-badge">DEMAND SIDE</span>
+          <h3 class="resource-title">Flexible Loads (362 kW Pool)</h3>
+          <p class="resource-desc">
+            Distributed multi-fleet demand management accounting for physical response latencies and process constraints. 100% of deferred energy is restored during off-peak valley hours (00:00–05:30).
+          </p>
+          <ul class="resource-specs">
+            <li>EV Smart Charging <span>140 kW flex • 15 min delay</span></li>
+            <li>Municipal Water Pumping <span>105 kW flex • 30 min delay</span></li>
+            <li>Agricultural Irrigation <span>60 kW flex • 30 min delay</span></li>
+            <li>Commercial HVAC <span>45 kW flex • 15 min delay</span></li>
+            <li>Commercial Refrigeration <span>12 kW flex • 15 min delay</span></li>
+          </ul>
+        </div>
+
+        <div class="resource-card">
+          <span class="resource-badge">STORAGE SIDE</span>
+          <h3 class="resource-title">Community Battery (BESS)</h3>
+          <p class="resource-desc">
+            500 kWh community energy storage system reserved strictly for precision buffering of residual forecast error, eliminating unnecessary full-power cycling bursts.
+          </p>
+          <ul class="resource-specs">
+            <li>Nominal Capacity <span>500 kWh</span></li>
+            <li>Max Inverter Power <span>150 kW discharge</span></li>
+            <li>Safe Operational SOC <span>50.0% – 90.0%</span></li>
+            <li>Round-Trip Efficiency <span>95% continuous</span></li>
+            <li>Throughput Reduction <span>↓ 53.50% vs Reactive</span></li>
+          </ul>
+        </div>
+
+        <div class="resource-card">
+          <span class="resource-badge">RELIABILITY SIDE</span>
+          <h3 class="resource-title">Dynamic Reserve Capacity</h3>
+          <p class="resource-desc">
+            Pre-allocated headroom maintained in the battery to absorb cloud-induced solar ramp events without triggering feeder overloads or curtailment.
+          </p>
+          <ul class="resource-specs">
+            <li>Feeder Firm Rating <span>2,300 kW Limit</span></li>
+            <li>Solar Fleet Capacity <span>800 kW Rooftop PV</span></li>
+            <li>Intermittency Events <span>24 solar events modeled</span></li>
+            <li>Max Solar Ramp-Down <span>~285.5 kW observed</span></li>
+            <li>Reserve Actions Logged <span>148 reserve allocations</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. VERIFIED SIMULATION RESULTS -->
+  <section id="results" class="section">
+    <div class="container">
+      <div class="section-tag">04 • Performance Benchmark</div>
+      <h2 class="section-title">Verified 30-Day Multi-Scenario Results</h2>
+      <p class="section-desc">
+        Rigorous comparison across 2,880 discrete 15-minute intervals evaluating an unmanaged baseline, reactive threshold control, and predictive FlexProof.
+      </p>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Operational Metric</th>
+              <th>🔴 Baseline (Unmanaged)</th>
+              <th>🟡 Reactive Control</th>
+              <th>🟢 Predictive FlexProof</th>
+              <th>Predictive Impact</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Deficit Energy (kWh)</strong></td>
+              <td class="col-baseline">2,707.64 kWh</td>
+              <td class="col-reactive">83.78 kWh</td>
+              <td class="col-flexproof">1.67 kWh</td>
+              <td class="col-impact">↓ 99.94% (98.00% vs Reactive)</td>
+            </tr>
+            <tr>
+              <td><strong>Feeder Stress Overloads</strong></td>
+              <td class="col-baseline">125 intervals (31.25 h)</td>
+              <td class="col-reactive">14 intervals (3.50 h)</td>
+              <td class="col-flexproof">1 interval (0.25 h)</td>
+              <td class="col-impact">↓ 99.2% (92.86% vs Reactive)</td>
+            </tr>
+            <tr>
+              <td><strong>Peak Feeder Net Demand</strong></td>
+              <td class="col-baseline">2,621.11 kW</td>
+              <td class="col-reactive">2,374.19 kW</td>
+              <td class="col-flexproof">2,306.69 kW</td>
+              <td class="col-impact">↓ 314.41 kW peak shaved</td>
+            </tr>
+            <tr>
+              <td><strong>Maximum Overload Deficit</strong></td>
+              <td class="col-baseline">321.11 kW</td>
+              <td class="col-reactive">74.19 kW</td>
+              <td class="col-flexproof">6.69 kW</td>
+              <td class="col-impact">↓ 314.42 kW overload reduction</td>
+            </tr>
+            <tr>
+              <td><strong>Battery Cycling Throughput</strong></td>
+              <td class="col-baseline">0.00 kWh (Idle)</td>
+              <td class="col-reactive">1,552.60 kWh</td>
+              <td class="col-flexproof">721.95 kWh</td>
+              <td class="col-impact">↓ 53.50% less battery wear</td>
+            </tr>
+            <tr>
+              <td><strong>Flexible-Load Energy Shifted</strong></td>
+              <td class="col-baseline">0.00 kWh</td>
+              <td class="col-reactive">5,754.83 kWh</td>
+              <td class="col-flexproof">10,073.10 kWh</td>
+              <td class="col-impact">+4,318.27 kWh (+75.0%)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 8. OPERATOR EVIDENCE -->
+      <div class="section-tag" style="margin-top: 30px;">05 • Operator Evidence</div>
+      <h3 style="font-size: 1.4rem; font-weight: 800; margin-bottom: 20px; color: var(--text-main);">Demonstrated Dispatch Telemetry</h3>
+      
+      <div class="evidence-grid">
+        <div class="evidence-card">
+          <div class="evidence-stat">10,073.10 kWh</div>
+          <div class="evidence-label">Flexible Energy Shifted</div>
+          <div class="evidence-sub">Total deferrable energy shifted out of evening peak windows with 100% off-peak restoration.</div>
+        </div>
+        <div class="evidence-card">
+          <div class="evidence-stat">392 Actions</div>
+          <div class="evidence-label">Logged Proactive Events</div>
+          <div class="evidence-sub">210 load pre-shifts, 34 precision battery dispatches, and 148 reserve allocations recorded.</div>
+        </div>
+        <div class="evidence-card">
+          <div class="evidence-stat">24 Events</div>
+          <div class="evidence-label">Solar Intermittency Events</div>
+          <div class="evidence-sub">Cloud-cover attenuation events simulated to rigorously test reserve capacity buffering.</div>
+        </div>
+        <div class="evidence-card">
+          <div class="evidence-stat">~285.5 kW</div>
+          <div class="evidence-label">Maximum Solar Ramp-Down</div>
+          <div class="evidence-sub">Steepest single-interval solar drop successfully buffered without causing feeder violations.</div>
+        </div>
+      </div>
+
+      <!-- 9. SIMULATION SCOPE -->
+      <div class="scope-banner">
+        <div>
+          <div class="scope-text">Simulation Horizon: 30 Days • 2,880 Intervals • 15-Minute Timestep • 2,300 kW Feeder Limit</div>
+          <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 4px;">Indian neighbourhood distribution feeder model with calibrated solar PV, BESS, and flexible fleet dynamics.</div>
+        </div>
+        <div class="scope-tag">SIMULATION / CONTROL-ROOM PROTOTYPE — NOT CONNECTED TO LIVE GRID</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10. ARCHITECTURE -->
+  <section id="architecture" class="section">
+    <div class="container">
+      <div class="section-tag">06 • System Architecture</div>
+      <h2 class="section-title">Telemetry & Coordination Pipeline</h2>
+      <p class="section-desc">
+        Structured dataflow from historical telemetry ingestion to closed-loop dispatch verification.
+      </p>
+
+      <div class="arch-flow">
+        <div class="arch-step">
+          <div class="arch-num">01</div>
+          <div class="arch-info">
+            <h4>Solar & Demand Signals Ingestion</h4>
+            <p>24-hour rolling historical telemetry buffer (96 intervals) capturing diurnal demand curves and solar generation.</p>
+          </div>
+        </div>
+        <div class="arch-connector">↓</div>
+        <div class="arch-step">
+          <div class="arch-num">02</div>
+          <div class="arch-info">
+            <h4>1-Hour Ahead Forecasting Engine</h4>
+            <p>Multi-lag statistical regression projecting net demand across the upcoming 4 intervals without future data leakage.</p>
+          </div>
+        </div>
+        <div class="arch-connector">↓</div>
+        <div class="arch-step">
+          <div class="arch-num">03</div>
+          <div class="arch-info">
+            <h4>Predictive Flexibility Coordinator</h4>
+            <p>Evaluates fleet response latencies (15–30 min) and schedules advance pre-dispatch of water pumps, agricultural wells, and EVs.</p>
+          </div>
+        </div>
+        <div class="arch-connector">↓</div>
+        <div class="arch-step">
+          <div class="arch-num">04</div>
+          <div class="arch-info">
+            <h4>Real-Time Feeder Balancing & Dispatch</h4>
+            <p>Applies active load adjustments while coordinating community BESS as a smooth precision buffer within 50%–90% SOC bounds.</p>
+          </div>
+        </div>
+        <div class="arch-connector">↓</div>
+        <div class="arch-step">
+          <div class="arch-num">05</div>
+          <div class="arch-info">
+            <h4>Invariant Verification & Control Metrics</h4>
+            <p>Continuous validation of feeder limits, energy conservation, forecast residuals, and battery health logging.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11. CTA / LINKS -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="section-tag">07 • Access Prototype</div>
+      <h2 class="section-title">Explore the Prototype</h2>
+      <p class="section-desc" style="margin: 0 auto 30px;">
+        Access the interactive Streamlit command center or inspect the open-source implementation.
+      </p>
+
+      <div class="cta-grid">
+        <a href="YOUR_STREAMLIT_DASHBOARD_URL" target="_blank" rel="noopener noreferrer" class="cta-box">
+          <div class="cta-box-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          </div>
+          <div class="cta-box-title">Live Control Room</div>
+          <div class="cta-box-sub">Interactive Streamlit dashboard with 30-day timelines, forecast residuals, and event replay.</div>
+          <div class="cta-box-btn">Launch Dashboard →</div>
+        </a>
+
+        <a href="YOUR_GITHUB_REPOSITORY_URL" target="_blank" rel="noopener noreferrer" class="cta-box">
+          <div class="cta-box-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="#38bdf8"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          </div>
+          <div class="cta-box-title">Source Code</div>
+          <div class="cta-box-sub">Explore the simulation engine, controller algorithms, and automated test suite on GitHub.</div>
+          <div class="cta-box-btn">View Repository →</div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 12. TEAM -->
+  <section id="team" class="section">
+    <div class="container">
+      <div class="section-tag" style="text-align: center; display: block;">08 • Project Team</div>
+      <h2 class="section-title" style="text-align: center;">Developed by</h2>
+      <p class="section-desc" style="text-align: center; margin: 0 auto 36px;">
+        Schneider Electric Yuva Yodha Energy Tech Hackathon 2026
+      </p>
+
+      <div class="team-grid">
+        <div class="team-card">
+          <div class="team-name">Nirman Amrawanshi</div>
+          <div class="team-role">Team Leader</div>
+          <div class="team-org">Indian Institute of Information Technology, Nagpur (IIIT Nagpur)</div>
+        </div>
+        <div class="team-card">
+          <div class="team-name">Jayesh Pate</div>
+          <div class="team-role">Team Member</div>
+          <div class="team-org">Indian Institute of Information Technology, Nagpur (IIIT Nagpur)</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 13. FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-thesis">FlexProof — Predict. Prepare. Coordinate. Dispatch. Learn.</div>
+      <div>Schneider Electric Yuva Yodha Energy Tech Hackathon 2026 • IIIT Nagpur</div>
+      <div style="margin-top: 6px; font-size: 0.78rem;">Simulation / Control-Room Prototype — Not connected to a live physical grid.</div>
+    </div>
+  </footer>
+
+</body>
+</html>
